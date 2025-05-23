@@ -36,8 +36,16 @@
 #
 # DATA and ACKNOWLEDGEMENT:
 #
-# The product is generated using Copernicus Climate Change Service information, 2025. 
-# ECMWF Reanalysis v5 (ERA5) (Hersbach, et al. 2020)
+# The product is generated using Copernicus Climate Change Service information (CCCS/CDS, 2023). 
+# ECMWF Reanalysis v5 (ERA5) (Hersbach, et al. 2020; Hersbach et al., 2023)
+#
+# Copernicus Climate Change Service, Climate Data Store, (2023): ERA5 hourly data on pressure levels from 1940 to present. 
+#   Copernicus Climate Change Service (C3S) Climate Data Store (CDS), https://doi.org/10.24381/cds.bd0915c6
+#
+# Hersbach, H., B. Bell, P. Berrisford, G. Biavati, A. Horányi, J. Muñoz Sabater, J. Nicolas, C. Peubey, C., 
+#   R. Radu, I. Rozum, D. Schepers, A. Simmons, C. Soci, D. Dee, and J.-N. Thépaut (2023): ERA5 hourly data on 
+#   pressure levels from 1940 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS), 
+#   https://doi.org/10.24381/cds.bd0915c6
 #
 # Hersbach, H., B. Bell, P. Berrisford, S. Hirahara, A. Horányi, J. Muñoz-Sabater, J. Nicolas, C. Peubey, 
 #   R.Radu, D. Schepers, A. Simmons, C. Soci, S. Abdalla, X. Abellan, G. Balsamo, P. Bechtold, G. Biavati, 
@@ -67,7 +75,11 @@
 # ################################################################################################################
 
 # import modules
-import os, argparse, cdsapi, datetime, xarray as xr
+import os, shutil, argparse, cdsapi, datetime, xarray as xr
+
+# filenames
+fname = 'albsa_index.nc' # the new file name
+tname = 'tmp.nc' # a temporary file
 
 # you are required to provide a directory path
 # you are permitted to specify beginning and end dates (year granularity)
@@ -130,14 +142,14 @@ def era5_downloader(yrlist):
             "18:00"
         ],
         "pressure_level": ["850"],
-        "grid": ["2.5","2.5"],
+        "grid": ["5/5"],
         "data_format": "netcdf",
         "download_format": "unarchived",
         "area": [85, 150, 40, -120]
     }
 
     client = cdsapi.Client()
-    client.retrieve(dataset, request, working_dir+'tmp.nc') # tmp.nc is a temporary file that will be deleted at the end of the code
+    client.retrieve(dataset, request, working_dir+tname) # tmp.nc is a temporary file that will be deleted at the end of the code
 
 
 def main():
@@ -146,12 +158,10 @@ def main():
     era5_downloader(yrlist)
 
     # open the temporary ERA5 file using xarray
-    file = xr.open_dataset(working_dir+'tmp.nc')
+    file = xr.open_dataset(working_dir+tname)
 
     # resample from 4x/day to daily
     file = file.resample(valid_time="D").mean() 
-
-    file['longitude'] = file['longitude'] + 180
 
     # calculate albsa
 
@@ -180,15 +190,22 @@ def main():
 
     print(file)
     
-    # remove some variables
-    albi['number'].drop_attrs()
-    albi = albi.drop_vars('number') 
+    # housekeeping
+    file['number'].drop_attrs()
+    file = file.drop_vars('number') 
+    file['z'] = file['z'].squeeze()
+    file['latitude'] = file['latitude'].astype('float32')
+    file['longitude'] = file['longitude'].astype('float32')
+
+    # if an existing data set is found, politely move it
+    if os.path.isfile(working_dir+fname):
+        shutil.move(working_dir+fname, working_dir+fname+'.arch')
 
     # write back to new file
-    file.to_netcdf(working_dir+'albsa_index.nc')
+    file.to_netcdf(working_dir+fname)
 
     # delete the intermediary file
-    #os.remove(working_dir+'tmp.nc')
+    os.remove(working_dir+'tmp.nc')
 
 
 # executes main():

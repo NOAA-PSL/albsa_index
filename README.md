@@ -16,13 +16,21 @@ This code handles the download from ECMWF, the calculation, and the writes the n
 
 ## References and Acknowledgement 
 
-The product is generated using Copernicus Climate Change Service information, 2025. 
-ECMWF Reanalysis v5 (ERA5) (Hersbach, et al. 2020)
+The product is generated using Copernicus Climate Change Service information (CCCS/CDS, 2023). 
+ ECMWF Reanalysis v5 (ERA5) (Hersbach, et al. 2020; Hersbach et al., 2023)
+
+Copernicus Climate Change Service, Climate Data Store, (2023): ERA5 hourly data on pressure levels from 1940 to present. 
+   Copernicus Climate Change Service (C3S) Climate Data Store (CDS), [DOI:10.243381/cds.bd0915c6](https://doi.org/10.24381/cds.bd0915c6)
 
 Cox, C. J., R. S. Stone, D. C. Douglas, D. M. Stanitski, and D. C. Douglas (2019), The Aleutian Low - 
   Beaufort Sea Anticyclone: A climate index correlated with the timing of springtime melt in the
   Pacific Arctic cryosphere. Geophysical Research Letters, 46(13), 7464-7473, 
   [DOI:10.1029/2019GL083306](https://doi.org/10.1029/2019GL083306)
+
+Hersbach, H., B. Bell, P. Berrisford, G. Biavati, A. Horányi, J. Muñoz Sabater, J. Nicolas, C. Peubey, C., 
+   R. Radu, I. Rozum, D. Schepers, A. Simmons, C. Soci, D. Dee, and J.-N. Thépaut (2023): ERA5 hourly data on 
+   pressure levels from 1940 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS), 
+   [DOI:10.24381/cds.bd0915c6](https://doi.org/10.24381/cds.bd0915c6)
 
 Hersbach, H., B. Bell, P. Berrisford, S. Hirahara, A. Horányi, J. Muñoz-Sabater, J. Nicolas, C. Peubey, 
    R.Radu, D. Schepers, A. Simmons, C. Soci, S. Abdalla, X. Abellan, G. Balsamo, P. Bechtold, G. Biavati, 
