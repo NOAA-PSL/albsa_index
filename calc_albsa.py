@@ -79,7 +79,6 @@ import os, shutil, argparse, cdsapi, datetime, xarray as xr
 
 # filenames
 fname = 'albsa_index.nc' # the new file name
-tname = 'tmp.nc' # a temporary file
 
 # you are required to provide a directory path
 # you are permitted to specify beginning and end dates (year granularity)
@@ -108,7 +107,7 @@ for i in range(yrbeg,yrend+1):
     yrlist.append(str(i))
 
 # uses the Climate Data Store (CDS) API to download data from ECMWF
-def era5_downloader(yrlist):
+def era5_downloader(yrlist,tname):
 
     # create a request for ERA5 presure level 850 hPa, 4x daily, all years for the AK domain, 2.5d resolution
     dataset = "reanalysis-era5-pressure-levels"
@@ -155,7 +154,11 @@ def era5_downloader(yrlist):
 def main():
 
     # download data
-    era5_downloader(yrlist)
+    #   this needs to be batched. limits for CDS are 60K "items", which is 1 field x 1 var x 1 level x n time steps
+    #   for this application at 4x/day, 20 years is about 30K. So lets do 20 year batches.
+    batch_size = 2
+    for i in range(0, len(yrlist), batch_size):
+        era5_downloader(yrlist[i:i+batch_size],'tmp_'+yrlist[i]+'nc')
 
     # open the temporary ERA5 file using xarray
     file = xr.open_dataset(working_dir+tname)
