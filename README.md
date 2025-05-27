@@ -16,7 +16,7 @@ absolute value of the error variance is ~0.035%. This code handles the download 
 A histogram of the differences:
 
 <div style="text-align: center;">
-  <img src="era5_v_nnr_compare.png" width="800" height="400">
+  <img src="era5_v_nnr_compare.png" width="550" height="400">
 </div>
 
 ## References and Acknowledgement 
