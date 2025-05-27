@@ -23,8 +23,8 @@
 #
 # The index has been most commonly defined based on the NCEP/NCAR Reanalysis 1, but in depreciation 
 #   this routine calculates ALBSA using the ECMWF ERA5 reanalysis.
-# Testing in May 2025 shows differences between the reanalyses of mean X m, std X m, averaged for all
-#   days overlapping 1948-2025.
+# Testing in May 2025 shows differences between the reanalyses of mean 1.5e-5 m, std 19.39 m, averaged for all 
+#   days overlapping 1948-2025 (n = 28259). The mean absolute value of the error variance is ~0.035%.
 # This code handles the download from ECMWF, the calculation, and the writes the new NetCDF.
 #
 # Cox, C. J., R. S. Stone, D. C. Douglas, D. M. Stanitski, and D. C. Douglas (2019), The Aleutian Low - 
