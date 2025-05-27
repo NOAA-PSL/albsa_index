@@ -15,9 +15,9 @@ Testing in May 2025 shows differences between the reanalyses of mean 1.5e-5 m, s
 absolute value of the error variance is ~0.035%. This code handles the download from ECMWF, the calculation, and the writes the new NetCDF.
 A histogram of the differences:
 
-<div style="text-align: center;">
+<p align="center">
   <img src="era5_v_nnr_compare.png" width="550" height="400">
-</div>
+</p>
 
 ## References and Acknowledgement 
 
