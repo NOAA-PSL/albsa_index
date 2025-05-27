@@ -23,7 +23,7 @@
 #
 # The index has been most commonly defined based on the NCEP/NCAR Reanalysis 1, but in depreciation 
 #   this routine calculates ALBSA using the ECMWF ERA5 reanalysis.
-# Testing in May 2025 shows differences between the reanalyses of mean 1.5e-5 m, std 19.39 m, averaged for all 
+# Testing in May 2025 shows differences between the reanalyses of mean -0.24 m, std 19.5 m, averaged for all 
 #   days overlapping 1948-2025 (n = 28259). The mean absolute value of the error variance is ~0.035%.
 # This code handles the download from ECMWF, the calculation, and the writes the new NetCDF.
 #
@@ -78,14 +78,14 @@
 import os, shutil, argparse, cdsapi, datetime, glob, xarray as xr
 
 # filenames
-fname = 'albsa_index.nc' # the new file name
+fname = "albsa_index.nc" # the new file name
 
 # you are required to provide a directory path
 # you are permitted to specify beginning and end dates (year granularity)
 parser = argparse.ArgumentParser()
-parser.add_argument('-p', '--path', metavar='str', help='path to working directory, include trailing /')
-parser.add_argument('-s', '--start_date', metavar='str', help='beginning of processing period, yyyy')
-parser.add_argument('-e', '--end_date', metavar='str', help='ending of processing period, yyyy')
+parser.add_argument("-p", "--path", metavar="str", help="path to working directory, include trailing /")
+parser.add_argument("-s", "--start_date", metavar="str", help="beginning of processing period, yyyy")
+parser.add_argument("-e", "--end_date", metavar="str", help="ending of processing period, yyyy")
 args = parser.parse_args()
 
 try: working_dir = args.path
@@ -157,12 +157,12 @@ def main():
     #   this needs to be batched. limits for CDS are 60K "items", which is 1 field x 1 var x 1 level x n time steps
     #   for this application at 4x/day, 20 years is about 30K. So lets do 20 year batches.
     batch_size = 5
-    for i in range(0, len(yrlist), batch_size):
-        era5_downloader(yrlist[i:i+batch_size],'tmp_'+yrlist[i]+'.nc')
+    #for i in range(0, len(yrlist), batch_size):
+    #    era5_downloader(yrlist[i:i+batch_size],"tmp_"+yrlist[i]+".nc")
 
     # open the temporary ERA5 files using xarray and merge them into one xr.Dataset()
     file = xr.Dataset()
-    for filename in glob.glob(working_dir+'tmp*.nc'):
+    for filename in glob.glob(working_dir+"tmp*.nc"):
         filetmp = xr.open_dataset(filename)
         file = xr.merge([file,filetmp])
 
@@ -184,34 +184,73 @@ def main():
     # 850 hPa daily mean GPH at 4 ALBSA coordinates.
     # The method is NN, but the data has been downloaded on pre-processed 2.5d grid, 
     #   which is a coarser, but divisible resampling of the native 0.25d grid.  
-    Scoord = file.sel(latitude=laS, longitude=loS, method="nearest")/10
-    Ncoord = file.sel(latitude=laN, longitude=loN, method="nearest")/10
-    Ecoord = file.sel(latitude=laE, longitude=loE, method="nearest")/10
-    Wcoord = file.sel(latitude=laW, longitude=loW, method="nearest")/10
+    Scoord = file.sel(latitude=laS, longitude=loS, method="nearest")/9.81
+    Ncoord = file.sel(latitude=laN, longitude=loN, method="nearest")/9.81
+    Ecoord = file.sel(latitude=laE, longitude=loE, method="nearest")/9.81
+    Wcoord = file.sel(latitude=laW, longitude=loW, method="nearest")/9.81
 
     # calculate ALBSA index
     #   Eq. (3) from Cox et al. (2019)
     albi = ( Ecoord.z - Wcoord.z ) - ( Ncoord.z - Scoord.z )
     file = file.assign(index=albi.transpose())
-
-    print(file)
     
     # housekeeping
-    file['number'].drop_attrs()
-    file = file.drop_vars('number') 
-    file['z'] = file['z'].squeeze()
-    file['latitude'] = file['latitude'].astype('float32')
-    file['longitude'] = file['longitude'].astype('float32')
+    file["number"].drop_attrs()
+    file = file.drop_vars("number") 
+    file["z"] = file["z"].squeeze()
+    file["latitude"] = file["latitude"].astype("float32")
+    file["longitude"] = file["longitude"].astype("float32")
 
     # if an existing data set is found, politely move it
     if os.path.isfile(working_dir+fname):
-        shutil.move(working_dir+fname, working_dir+fname+'.arch')
+        shutil.move(working_dir+fname, working_dir+fname+".arch")
+
+    # we will carry most of the attributes, but "index" is a new var, so create some
+    file["index"] = file["index"].assign_attrs({"long_name": "ALBSA index"})
+    file["index"] = file["index"].assign_attrs({"units": "meters"})
+    file["index"] = file["index"].assign_attrs({"standard_name": " "})
+
+    # global attributes
+    file.attrs["title"] = "Aleutian Low-Beaufort Sea Anticyclone (ALBSA) index"
+    file.attrs["source"] = "ECMWF Reanalysis v5 (ERA5)"
+    file.attrs["date_created"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    file.attrs["file_creator"] = "Christopher J. Cox"
+    file.attrs["creator_email"] = "christopher.j.cox@noaa.gov"
+    file.attrs["insitution"] = "National Oceanic and Atmospheric Administration (NOAA) Physical Sciences Laboratory (PSL)"
+    file.attrs['methods'] = "Calculation based on the study of Cox et al. (2019)."
+    file.attrs['keywords'] = "Arctic, climate index, snow, Alaska, atmospheric advection, sea ice"
+    file.attrs["acknowledgements"] = """This product was generated using the Copernicus Climate Change Service information (CCCS/CDS, 2023) using data ECMWF Reanalysis v5 (ERA5) (Hersbach, et al. 2020; Hersbach et al., 2023)."""
+    file.attrs["references"] = """References:
+    
+                                Copernicus Climate Change Service, Climate Data Store, (2023): ERA5 hourly data on pressure levels from 1940 to present. 
+                                    Copernicus Climate Change Service (C3S) Climate Data Store (CDS), https://doi.org/10.24381/cds.bd0915c6
+
+                                Cox, C. J., R. S. Stone, D. C. Douglas, D. M. Stanitski, and D. C. Douglas (2019), The Aleutian Low - 
+                                    Beaufort Sea Anticyclone: A climate index correlated with the timing of springtime melt in the
+                                    Pacific Arctic cryosphere. Geophysical Research Letters, 46(13), 7464-7473, 
+                                    https://doi.org/10.1029/2019GL083306
+
+                                Hersbach, H., B. Bell, P. Berrisford, G. Biavati, A. Horányi, J. Muñoz Sabater, J. Nicolas, C. Peubey, C., 
+                                    R. Radu, I. Rozum, D. Schepers, A. Simmons, C. Soci, D. Dee, and J.-N. Thépaut (2023): ERA5 hourly data on 
+                                    pressure levels from 1940 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS), 
+                                    https://doi.org/10.24381/cds.bd0915c6
+
+                                Hersbach, H., B. Bell, P. Berrisford, S. Hirahara, A. Horányi, J. Muñoz-Sabater, J. Nicolas, C. Peubey, 
+                                    R.Radu, D. Schepers, A. Simmons, C. Soci, S. Abdalla, X. Abellan, G. Balsamo, P. Bechtold, G. Biavati, 
+                                    J. Bidlot, M. Bonavita, G. De Chiara, P. Dahlgren, D. Dee, M. Diamantakis, R. Dragani, J. Flemming, 
+                                    R. Forbes, M. Fuentes, A. Geer, L. Haimberger, S. Healy, R. J. Hogan, E. Hólm, M. Janisková, S. Keeley, 
+                                    P. Laloyaux, P. Lopez, C. Lupu, G. Radnoti, P. de Rosnay, I. Rozum, F. Vamborg, S. Villaume, and J.-N. Thépaut 
+                                    (2020) The ERA5 global reanalysis. Quarterly Journal of the Royal Meteorological Society, 146(730), 1999-2049,
+                                    https://doi.org/10.1002/qj.3803"""
+    
+
 
     # write back to new file
     file.to_netcdf(working_dir+fname)
+    file.close()
 
-    # delete the intermediary file
-    #for filename in glob.glob(working_dir+'tmp*.nc'):
+    # delete the intermediary files
+    #for filename in glob.glob(working_dir+"tmp*.nc"):
     #    os.remove(filename)
 
 
