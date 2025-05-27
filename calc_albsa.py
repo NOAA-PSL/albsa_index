@@ -75,7 +75,7 @@
 # ################################################################################################################
 
 # import modules
-import os, shutil, argparse, cdsapi, datetime, xarray as xr
+import os, shutil, argparse, cdsapi, datetime, glob, xarray as xr
 
 # filenames
 fname = 'albsa_index.nc' # the new file name
@@ -148,7 +148,7 @@ def era5_downloader(yrlist,tname):
     }
 
     client = cdsapi.Client()
-    client.retrieve(dataset, request, working_dir+tname) # tmp.nc is a temporary file that will be deleted at the end of the code
+    client.retrieve(dataset, request, working_dir+tname) # the tmp file is a temporary file that will be deleted at the end of the code
 
 
 def main():
@@ -156,12 +156,15 @@ def main():
     # download data
     #   this needs to be batched. limits for CDS are 60K "items", which is 1 field x 1 var x 1 level x n time steps
     #   for this application at 4x/day, 20 years is about 30K. So lets do 20 year batches.
-    batch_size = 2
+    batch_size = 5
     for i in range(0, len(yrlist), batch_size):
-        era5_downloader(yrlist[i:i+batch_size],'tmp_'+yrlist[i]+'nc')
+        era5_downloader(yrlist[i:i+batch_size],'tmp_'+yrlist[i]+'.nc')
 
-    # open the temporary ERA5 file using xarray
-    file = xr.open_dataset(working_dir+tname)
+    # open the temporary ERA5 files using xarray and merge them into one xr.Dataset()
+    file = xr.Dataset()
+    for filename in glob.glob(working_dir+'tmp*.nc'):
+        filetmp = xr.open_dataset(filename)
+        file = xr.merge([file,filetmp])
 
     # resample from 4x/day to daily
     file = file.resample(valid_time="D").mean() 
@@ -208,7 +211,8 @@ def main():
     file.to_netcdf(working_dir+fname)
 
     # delete the intermediary file
-    os.remove(working_dir+'tmp.nc')
+    #for filename in glob.glob(working_dir+'tmp*.nc'):
+    #    os.remove(filename)
 
 
 # executes main():
