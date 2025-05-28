@@ -150,6 +150,58 @@ def era5_downloader(yrlist,tname):
     client = cdsapi.Client()
     client.retrieve(dataset, request, working_dir+tname) # the tmp file is a temporary file that will be deleted at the end of the code
 
+# encode desired global attributes (in order of appearance) here
+def define_glob_atts():
+
+    # key-value pairs are attributes names / attributes
+    global_atts = {
+            "date_created"     :datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "title"            :"Aleutian Low-Beaufort Sea Anticyclone (ALBSA) index",
+            "institution"      :"National Oceanic and Atmospheric Administration (NOAA) Physical Sciences Laboratory (PSL)",
+            "file_creator"     :"Christopher J. Cox",
+            "creator_email"    :"christopher.j.cox@noaa.gov", 
+            "Funding"          :"NOAA Physical Sciences Laboratory (PSL)",
+            "source"           :"ECMWF Reanalysis v5 (ERA5)", 
+            "methods"          :"Calculation based on the study of Cox et al. (2019).",
+            "keywords"         :"Arctic, climate index, snow, Alaska, atmospheric advection, sea ice",
+            "acknowledgements" :"This product was generated using the Copernicus Climate Change Service information (CCCS/CDS, 2023) using data ECMWF Reanalysis v5 (ERA5) (Hersbach, et al. 2020; Hersbach et al., 2023).",
+            "references"       :"""References:
+        
+                                    Copernicus Climate Change Service, Climate Data Store, (2023): ERA5 hourly data on pressure levels from 1940 to present. 
+                                        Copernicus Climate Change Service (C3S) Climate Data Store (CDS), https://doi.org/10.24381/cds.bd0915c6
+
+                                    Cox, C. J., R. S. Stone, D. C. Douglas, D. M. Stanitski, and D. C. Douglas (2019), The Aleutian Low - 
+                                        Beaufort Sea Anticyclone: A climate index correlated with the timing of springtime melt in the
+                                        Pacific Arctic cryosphere. Geophysical Research Letters, 46(13), 7464-7473, 
+                                        https://doi.org/10.1029/2019GL083306
+
+                                    Hersbach, H., B. Bell, P. Berrisford, G. Biavati, A. Horányi, J. Muñoz Sabater, J. Nicolas, C. Peubey, C., 
+                                        R. Radu, I. Rozum, D. Schepers, A. Simmons, C. Soci, D. Dee, and J.-N. Thépaut (2023): ERA5 hourly data on 
+                                        pressure levels from 1940 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS), 
+                                        https://doi.org/10.24381/cds.bd0915c6
+
+                                    Hersbach, H., B. Bell, P. Berrisford, S. Hirahara, A. Horányi, J. Muñoz-Sabater, J. Nicolas, C. Peubey, 
+                                        R.Radu, D. Schepers, A. Simmons, C. Soci, S. Abdalla, X. Abellan, G. Balsamo, P. Bechtold, G. Biavati, 
+                                        J. Bidlot, M. Bonavita, G. De Chiara, P. Dahlgren, D. Dee, M. Diamantakis, R. Dragani, J. Flemming, 
+                                        R. Forbes, M. Fuentes, A. Geer, L. Haimberger, S. Healy, R. J. Hogan, E. Hólm, M. Janisková, S. Keeley, 
+                                        P. Laloyaux, P. Lopez, C. Lupu, G. Radnoti, P. de Rosnay, I. Rozum, F. Vamborg, S. Villaume, and J.-N. Thépaut 
+                                        (2020) The ERA5 global reanalysis. Quarterly Journal of the Royal Meteorological Society, 146(730), 1999-2049,
+                                        https://doi.org/10.1002/qj.3803"""
+    }
+
+    return global_atts
+
+# encode additional variable attributes here
+def define_var_atts():
+       
+    # keys are place holders      {"variable","att_name","att_value"}
+    var_atts = {
+        "index_att1"            :("index", "long_name", "ALBSA index"),
+        "index_att2"            :("index", "units", "meters"),
+        "index_att3"            :("index", "standard_name", ""),
+    }
+
+    return var_atts
 
 def main():
 
@@ -205,45 +257,15 @@ def main():
     if os.path.isfile(working_dir+fname):
         shutil.move(working_dir+fname, working_dir+fname+".arch")
 
-    # we will carry most of the attributes, but "index" is a new var, so create some
-    file["index"] = file["index"].assign_attrs({"long_name": "ALBSA index"})
-    file["index"] = file["index"].assign_attrs({"units": "meters"})
-    file["index"] = file["index"].assign_attrs({"standard_name": " "})
+    # we will carry most of the attributes, but "index" is a new var, so we created some in define_var_atts()
+    var_atts = define_var_atts()
+    for value in var_atts.values():
+        file[value[0]].attrs[value[1]] = value[2]
 
     # global attributes
-    file.attrs["title"] = "Aleutian Low-Beaufort Sea Anticyclone (ALBSA) index"
-    file.attrs["source"] = "ECMWF Reanalysis v5 (ERA5)"
-    file.attrs["date_created"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    file.attrs["file_creator"] = "Christopher J. Cox"
-    file.attrs["creator_email"] = "christopher.j.cox@noaa.gov"
-    file.attrs["insitution"] = "National Oceanic and Atmospheric Administration (NOAA) Physical Sciences Laboratory (PSL)"
-    file.attrs['methods'] = "Calculation based on the study of Cox et al. (2019)."
-    file.attrs['keywords'] = "Arctic, climate index, snow, Alaska, atmospheric advection, sea ice"
-    file.attrs["acknowledgements"] = """This product was generated using the Copernicus Climate Change Service information (CCCS/CDS, 2023) using data ECMWF Reanalysis v5 (ERA5) (Hersbach, et al. 2020; Hersbach et al., 2023)."""
-    file.attrs["references"] = """References:
-    
-                                Copernicus Climate Change Service, Climate Data Store, (2023): ERA5 hourly data on pressure levels from 1940 to present. 
-                                    Copernicus Climate Change Service (C3S) Climate Data Store (CDS), https://doi.org/10.24381/cds.bd0915c6
-
-                                Cox, C. J., R. S. Stone, D. C. Douglas, D. M. Stanitski, and D. C. Douglas (2019), The Aleutian Low - 
-                                    Beaufort Sea Anticyclone: A climate index correlated with the timing of springtime melt in the
-                                    Pacific Arctic cryosphere. Geophysical Research Letters, 46(13), 7464-7473, 
-                                    https://doi.org/10.1029/2019GL083306
-
-                                Hersbach, H., B. Bell, P. Berrisford, G. Biavati, A. Horányi, J. Muñoz Sabater, J. Nicolas, C. Peubey, C., 
-                                    R. Radu, I. Rozum, D. Schepers, A. Simmons, C. Soci, D. Dee, and J.-N. Thépaut (2023): ERA5 hourly data on 
-                                    pressure levels from 1940 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS), 
-                                    https://doi.org/10.24381/cds.bd0915c6
-
-                                Hersbach, H., B. Bell, P. Berrisford, S. Hirahara, A. Horányi, J. Muñoz-Sabater, J. Nicolas, C. Peubey, 
-                                    R.Radu, D. Schepers, A. Simmons, C. Soci, S. Abdalla, X. Abellan, G. Balsamo, P. Bechtold, G. Biavati, 
-                                    J. Bidlot, M. Bonavita, G. De Chiara, P. Dahlgren, D. Dee, M. Diamantakis, R. Dragani, J. Flemming, 
-                                    R. Forbes, M. Fuentes, A. Geer, L. Haimberger, S. Healy, R. J. Hogan, E. Hólm, M. Janisková, S. Keeley, 
-                                    P. Laloyaux, P. Lopez, C. Lupu, G. Radnoti, P. de Rosnay, I. Rozum, F. Vamborg, S. Villaume, and J.-N. Thépaut 
-                                    (2020) The ERA5 global reanalysis. Quarterly Journal of the Royal Meteorological Society, 146(730), 1999-2049,
-                                    https://doi.org/10.1002/qj.3803"""
-    
-
+    global_atts = define_glob_atts()
+    for key, value in global_atts.items():
+        file.attrs[key] = value
 
     # write back to new file
     file.to_netcdf(working_dir+fname)
