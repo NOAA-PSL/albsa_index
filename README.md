@@ -10,7 +10,7 @@ ALBSA is a 4-pt index on the geopotential height field a 850 hPa where the point
    ALBSA = ( E-W ) - ( N - S ) and is expressed in meters of GPH. The mean state of the wintertime (September - May) positive and negative values are as follows:
 
 <p align="center">
-  <img src="albsamap.png" width="550" height="400">
+  <img src="albsamap.png" width="550" height="230">
 </p>
 
 The index has been most commonly defined based on the NCEP/NCAR Reanalysis 1, but in depreciation this routine calculates ALBSA using the ECMWF ERA5 reanalysis.
