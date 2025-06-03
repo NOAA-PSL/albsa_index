@@ -310,8 +310,8 @@ def main():
     file.close()
 
     # delete the intermediary files
-    for filename in glob.glob(working_dir+"tmp*.nc"):
-        os.remove(filename)
+    #for filename in glob.glob(working_dir+"tmp*.nc"):
+    #    os.remove(filename)
 
 
 # executes main():

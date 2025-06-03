@@ -1,14 +1,17 @@
 # Create ALBSA index data set
 
-Create a NetCDF4 file containing daily calculations of the ALBSA index.
-ALBSA: "Aleutian Low - Beaufort Sea Anticyclone" (Cox et al., 2019)
-It is a 4-pt index on the geopotential height field a 850 hPa where the points are 
+Creates a NetCDF4 file containing daily calculations of the "Aleutian Low - Beaufort Sea Anticyclone" (Cox et al., 2019).
+ALBSA is a 4-pt index on the geopotential height field a 850 hPa where the points are 
    North (“N” at 75°N/170°W), 
    South (“S” at 50°N/170°W), 
    East (“E” at 55°N/150°W), and 
    West (“W” at 55°N/160°E)
 
-   ALBSA = ( E-W ) - ( N - S ) and is expressed in meters of GPH
+   ALBSA = ( E-W ) - ( N - S ) and is expressed in meters of GPH. The mean state of the wintertime (September - May) positive and negative values are as follows:
+
+<p align="center">
+  <img src="albsamap.png" width="550" height="400">
+</p>
 
 The index has been most commonly defined based on the NCEP/NCAR Reanalysis 1, but in depreciation this routine calculates ALBSA using the ECMWF ERA5 reanalysis.
 Testing in May 2025 shows differences between the reanalyses of mean -0.24 m, std 19.5 m, averaged for all days overlapping 1948-2025 (n = 28259). The mean
