@@ -72,6 +72,10 @@
 #   xarray ≥ 2024.11.0
 #   cdsapi ≥ 0.7.6
 #
+# LICENSE:
+#
+#   Creative Commons Attribution 4.0 International License, CC BY 4.0
+#
 # ################################################################################################################
 
 # import modules
@@ -86,11 +90,21 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-p", "--path", metavar="str", help="path to working directory, include trailing /")
 parser.add_argument("-s", "--start_date", metavar="str", help="beginning of processing period, yyyy")
 parser.add_argument("-e", "--end_date", metavar="str", help="ending of processing period, yyyy")
+parser.add_argument("-d", "--delete_files", action="store_true", help="if flag given (no value), delete downloaded files, else retain")
+parser.add_argument("-n", "--no_get_files", action="store_true", help="if flag given (no value), will not download new files but looks for existing data locally")
 args = parser.parse_args()
 
 try: working_dir = args.path
 except: print("Please specify a working directory path using -e")
 if working_dir[-1] != "/": working_dir = working_dir+"/"
+
+# data flags
+
+if args.delete_files: delete_files = 1
+else: delete_files = 0
+
+if args.no_get_files: no_get_files = 1
+else: no_get_files = 0
 
 # create a list of years to access
 
@@ -108,7 +122,7 @@ for i in range(yrbeg,yrend+1):
 
 # for the NetCDF history
 def code_version():
-    cv = '1.0, 5/28/2025'
+    cv = '1.0, 6/6/2025'
     return cv
 
 # uses the Climate Data Store (CDS) API to download data from ECMWF
@@ -233,13 +247,20 @@ def main():
     # download data
     #   this needs to be batched. limits for CDS are 60K "items", which is 1 field x 1 var x 1 level x n time steps
     #   for this application at 4x/day, 20 years is about 30K. So lets do 20 year batches.
-    batch_size = 5
-    for i in range(0, len(yrlist), batch_size):
-        era5_downloader(yrlist[i:i+batch_size],"tmp_"+yrlist[i]+".nc")
+    if no_get_files == 0:
+        batch_size = 5
+        for i in range(0, len(yrlist), batch_size):
+            era5_downloader(yrlist[i:i+batch_size],"tmp_"+yrlist[i]+".nc")
+
+    # check for files
+    era5pattern = working_dir+"tmp*.nc"
+    fcheck = glob.glob(era5pattern)
+    if not fcheck:
+        raise FileNotFoundError(f"No files found matching pattern: {era5pattern}")
 
     # open the temporary ERA5 files using xarray and merge them into one xr.Dataset()
     file = xr.Dataset()
-    for filename in glob.glob(working_dir+"tmp*.nc"):
+    for filename in glob.glob(era5pattern):
         filetmp = xr.open_dataset(filename)
         file = xr.merge([file,filetmp])
 
@@ -310,8 +331,9 @@ def main():
     file.close()
 
     # delete the intermediary files
-    #for filename in glob.glob(working_dir+"tmp*.nc"):
-    #    os.remove(filename)
+    if delete_files == 1:
+        for filename in glob.glob(era5pattern):
+            os.remove(filename)
 
 
 # executes main():
