@@ -167,7 +167,7 @@ def define_glob_atts():
             "creator_email"    :"christopher.j.cox@noaa.gov", 
             "funding"          :"NOAA Physical Sciences Laboratory (PSL)",
             "source"           :"ECMWF Reanalysis v5 (ERA5)",
-            "license"          :"Creative Commons Attribution 4.0 License, CC 4.0",  
+            "license"          :"Creative Commons Attribution 4.0 International License, CC BY 4.0",  
             "methods"          :"Refer to Cox et al. (2019)",
             "conventions"      :"CF-1.12",  
             "commment"         :"",
