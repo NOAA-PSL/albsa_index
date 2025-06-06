@@ -64,6 +64,8 @@
 #   -p: path to working directory (REQUIRED)
 #   -s: starting year for the desired file contents (OPTIONAL; default to 1940)
 #   -e: ending year for the desired file contents (OPTIONAL; default to current year)
+#   -d: use this flag to prevent deletion of tmp files downloaded from Copernicus
+#   -n: use this flag to prevent code from downloading new tmp file from Copernicus
 #
 # DEPENDENCIES:
 #
@@ -79,7 +81,7 @@
 # ################################################################################################################
 
 # import modules
-import os, shutil, argparse, cdsapi, datetime, glob, xarray as xr
+import os, shutil, argparse, cdsapi, datetime, glob, netCDF4, xarray as xr
 
 # filenames
 fname = "albsa_index.nc" # the new file name
@@ -279,10 +281,18 @@ def main():
     laW = 55
     loW = 160
 
-    # convert the geopotential field [m^2/s^2] to geopotential height [m]
-    z_attrs = file['z'].attrs.copy() # save the attributes
+    # convert the geopotential field [m^2/s^2] to geopotential height [m], edit atts, write atts back to var
+    z_attrs = file["z"].attrs.copy() # save the attributes
     grav = 9.80665 # gravity constant used by ECMWF
-    file['z'] = file['z']/grav
+    file["z"] = file["z"]/grav
+    z_attrs["GRIB_name"] = "Geopotential height" 
+    z_attrs["GRIB_cfName"] = "geopotential_height"
+    z_attrs["GRIB_units"] = "m"
+    z_attrs["long_name"] = "geopotential height at 850 hPa"
+    z_attrs["units"] = "m"
+    z_attrs["standard_name"] = "geopotential_height"
+    z_attrs['GRIB_paramId'] = "156 from 129"
+    z_attrs['comment'] = "Data originally downloaded as geopotential (GRIB_paramId = 129). Converted to geopotential height (GRIB_paramId = 156) using g=9.80665. Attributes updated."
     file['z'].attrs = z_attrs # reassign the attributes
 
     # 850 hPa daily mean GPH at 4 ALBSA coordinates.
@@ -308,6 +318,9 @@ def main():
         # placeholder from CDS for ensembles. deceptive for reanalysis, in this case = 1
     file["number"].drop_attrs() 
     file = file.drop_vars("number") 
+    file["pressure_level"].drop_attrs() 
+    file = file.drop_vars("pressure_level") 
+    
         # 4d to 3d bv squeezing the single-level pressure field
     file["z"] = file["z"].squeeze()
         # use single 
@@ -327,7 +340,7 @@ def main():
     for key, value in global_atts.items(): file.attrs[key] = value
 
     # write back to new file
-    file.to_netcdf(working_dir+fname)
+    file.to_netcdf(working_dir+fname,format="NETCDF4")
     file.close()
 
     # delete the intermediary files
