@@ -76,12 +76,14 @@
 #
 # LICENSE:
 #
-#   Copyright 2026 U.S. Federal Government (in countries where recognized)
+#   Copyright 2025 U.S. Federal Government (in countries where recognized)
 #
-#   This script contains code adapted from the Copernicus Climate Data Store 
-#   (https://cds.climate.copernicus.eu/how-to-api), used to access ERA5 data.
-#   The original code is licensed under CC-BY 4.0 and has been modified
-#   to meet the needs of this project.
+#   Software code created by U.S. Government employees is not subject to copyright in the United States
+#   (17 U.S.C. §105). The United States/Department of Commerce reserve all rights to seek and obtain
+#   copyright protection in countries other than the United States for Software authored in its entirety by the
+#   Department of Commerce. To this end, the Department of Commerce hereby grants to Recipient a
+#   royalty-free, nonexclusive license to use, copy, and create derivative works of the Software outside of the
+#   United States.
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -95,6 +97,11 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
+#   This script contains code adapted from the Copernicus Climate Data Store 
+#   (https://cds.climate.copernicus.eu/how-to-api), used to access ERA5 data.
+#   The original code is licensed under CC-BY 4.0 and has been modified
+#   to meet the needs of this project.
+
 # ################################################################################################################
 
 # import modules
