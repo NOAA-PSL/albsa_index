@@ -1,0 +1,46 @@
+1. Project Attribution 
+
+This Project was developed by employees of the National Oceanic and Atmospheric Administration (NOAA), National Marine Fisheries Service (NMFS).
+
+2. Federal Copyright Status 
+
+Software code created by U.S. Government employees is not subject to copyright in the United States (17 U.S.C. §105). The United States/Department of Commerce reserve all rights to seek and obtain copyright protection in countries other than the United States for Software authored in its entirety by the Department of Commerce.
+
+3. Third-Party Software and Data Attribution 
+
+This Project includes code and logic derived from the following third-party sources:
+
+Copernicus Climate Data Store (CDS) API Instructions:
+
+Source: https://cds.climate.copernicus.eu/how-to-api 
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0).
+
+Note on Modifications: The original API boilerplate logic modified to meet the needs of this project.
+
+ERA5 Reanalysis Data Access:
+
+Source: European Centre for Medium-Range Weather Forecasts (ECMWF) on behalf of the Copernicus Climate Change Service (C3S).
+
+Citation: Generated using Copernicus Climate Change Service information [2025].
+
+4. External Contributors Unless otherwise noted, all contributions from non-US federal government employee contributors are released under the Apache License, Version 2.0.
+
+5. Acknowledgements
+
+Copernicus Climate Change Service, Climate Data Store, (2023): ERA5 hourly data on pressure levels from 1940 to present. 
+
+Copernicus Climate Change Service (C3S) Climate Data Store (CDS), https://doi.org/10.24381/cds.bd0915c6
+
+Hersbach, H., B. Bell, P. Berrisford, G. Biavati, A. Horányi, J. Muñoz Sabater, J. Nicolas, C. Peubey, C., 
+  R. Radu, I. Rozum, D. Schepers, A. Simmons, C. Soci, D. Dee, and J.-N. Thépaut (2023): ERA5 hourly data on 
+  pressure levels from 1940 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS), 
+  https://doi.org/10.24381/cds.bd0915c6
+
+Hersbach, H., B. Bell, P. Berrisford, S. Hirahara, A. Horányi, J. Muñoz-Sabater, J. Nicolas, C. Peubey, 
+  R.Radu, D. Schepers, A. Simmons, C. Soci, S. Abdalla, X. Abellan, G. Balsamo, P. Bechtold, G. Biavati, 
+  J. Bidlot, M. Bonavita, G. De Chiara, P. Dahlgren, D. Dee, M. Diamantakis, R. Dragani, J. Flemming, 
+  R. Forbes, M. Fuentes, A. Geer, L. Haimberger, S. Healy, R. J. Hogan, E. Hólm, M. Janisková, S. Keeley, 
+  P. Laloyaux, P. Lopez, C. Lupu, G. Radnoti, P. de Rosnay, I. Rozum, F. Vamborg, S. Villaume, and J.-N. Thépaut 
+  (2020) The ERA5 global reanalysis. Quarterly Journal of the Royal Meteorological Society, 146(730), 1999-2049,
+  https://doi.org/10.1002/qj.3803

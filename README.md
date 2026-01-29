@@ -48,6 +48,8 @@ Hersbach, H., B. Bell, P. Berrisford, S. Hirahara, A. Horányi, J. Muñoz-Sabate
    (2020) The ERA5 global reanalysis. Quarterly Journal of the Royal Meteorological Society, 146(730), 1999-2049,
    [DOI:10.1002/qj.3803](https://doi.org/10.1002/qj.3803)
 
+Note on Modifications: The original API boilerplate logic (CC BY 4.0) modified to meet the needs of this project.
+
 ## Purpose
 
 The code will be run annually, most likely in early June (ALBSA is most useful September - May) and the output file will replace the previous one at the Arctic Data Center. 
@@ -85,7 +87,11 @@ cdsapi ≥ 0.7.6
 
 ## License
 
+Copyright 2025 U.S. Federal Government (in countries where recognized)
+
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
+Please refer to the [LICENSE](./LICENSE), [NOTICE](./NOTICE), and [INTENT](./INTENT.txt) files for details.
 
 ## Disclaimer
 
